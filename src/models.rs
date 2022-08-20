@@ -1,7 +1,7 @@
 use zbus::zvariant::OwnedObjectPath;
 
 // systemctl --state=help
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UnitLoadStateType {
     Stub,
     Loaded,
@@ -40,7 +40,7 @@ impl ToString for UnitLoadStateType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UnitActiveStateType {
     Active,
     Reloading,
@@ -79,7 +79,7 @@ impl ToString for UnitActiveStateType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UnitSubStateType {
     Abandon,
     Activating,

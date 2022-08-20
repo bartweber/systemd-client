@@ -29,7 +29,7 @@ fn main() -> Result<()> {
     // verify unit state given unit path
     let client = unit::build_blocking_proxy(svc_unit_path)?;
     let unit_props = client.get_properties()?;
-    let unit_props: UnitProps = unit_props.into();
+    let unit_props: UnitProps = unit_props;
     println!("{:?}", unit_props);
     assert_eq!(unit_props.load_state, UnitLoadStateType::Loaded);
     assert_eq!(unit_props.active_state, UnitActiveStateType::Active);
@@ -37,7 +37,7 @@ fn main() -> Result<()> {
     std::thread::sleep(std::time::Duration::from_secs(4));
     // service should exit after 3 sec
     let unit_props = client.get_properties()?;
-    let unit_props: UnitProps = unit_props.into();
+    let unit_props: UnitProps = unit_props;
     println!("{:?}", unit_props);
     assert_eq!(unit_props.load_state, UnitLoadStateType::Loaded);
     assert_eq!(unit_props.active_state, UnitActiveStateType::Inactive);
