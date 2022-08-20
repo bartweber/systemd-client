@@ -1,6 +1,7 @@
 [Unit]
 Description=test service
 After=
+Wants=
 
 [Service]
 WorkingDirectory=/path/to/directory
