@@ -31,6 +31,8 @@ trait SystemdManager {
     fn architecture(&self) -> zbus::Result<String>;
     #[dbus_proxy(property)]
     fn environment(&self) -> zbus::Result<Vec<String>>;
+    fn reload(&self) -> zbus::Result<()>;
+    fn reset_failed(&self) -> zbus::Result<()>;
 }
 
 pub async fn build_nonblock_proxy() -> Result<SystemdManagerProxy<'static>> {

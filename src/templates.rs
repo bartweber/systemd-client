@@ -49,7 +49,11 @@ impl<'a> UnitConfigurationBuilder<'a> {
         let description = self.description;
         let after = self.after;
         let wants = self.wants;
-        UnitConfiguration { description, after, wants }
+        UnitConfiguration {
+            description,
+            after,
+            wants,
+        }
     }
 }
 
@@ -57,6 +61,7 @@ pub enum ServiceType {
     Simple,
     Exec,
     Forking,
+    Notify,
 }
 
 impl Display for ServiceType {
@@ -65,6 +70,7 @@ impl Display for ServiceType {
             ServiceType::Simple => "simple",
             ServiceType::Exec => "exec",
             ServiceType::Forking => "forking",
+            ServiceType::Notify => "notify",
         };
         write!(f, "{}", ty)
     }

@@ -1,0 +1,1 @@
+zbus-xmlgen --system org.freedesktop.systemd1 /org/freedesktop/systemd1 > interface.rs
