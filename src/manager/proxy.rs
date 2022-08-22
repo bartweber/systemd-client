@@ -10,6 +10,7 @@ use crate::{Result, UnitTuple};
 trait SystemdManager {
     fn get_unit(&self, name: &str) -> zbus::Result<OwnedObjectPath>;
     fn list_units(&self) -> zbus::Result<Vec<UnitTuple>>;
+    fn list_unit_files(&self) -> zbus::Result<Vec<(String, String)>>;
     fn load_unit(&self, name: &str) -> zbus::Result<OwnedObjectPath>;
     fn reload_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
     fn restart_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
