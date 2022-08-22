@@ -15,6 +15,7 @@ trait SystemdManager {
     fn restart_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
     fn start_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
     fn stop_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
+    fn reset_failed_unit(&self, name: &str) -> zbus::Result<()>;
     fn enable_unit_files(
         &self,
         files: &[&str],
