@@ -76,6 +76,23 @@ impl Display for ServiceType {
     }
 }
 
+pub enum NotifyAccess {
+    Main,
+    Exec,
+    All,
+}
+
+impl Display for NotifyAccess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let access = match self {
+            NotifyAccess::Main => "main",
+            NotifyAccess::Exec => "exec",
+            NotifyAccess::All => "all",
+        };
+        write!(f, "{}", access)
+    }
+}
+
 pub enum RestartPolicy {
     No,
     OnSuccess,
@@ -151,6 +168,7 @@ impl<'a> EnvironmentVariableBuilder<'a> {
 // https://www.freedesktop.org/software/systemd/man/systemd.service.html#Service%20Templates
 pub struct ServiceConfiguration<'a> {
     pub ty: ServiceType,
+    pub notify_access: Option<NotifyAccess>,
     pub exec_start: Vec<&'a str>,
     pub restart_policy: RestartPolicy,
     // a unit-less value in seconds, or a time span value such as "5min 20s"
@@ -173,12 +191,16 @@ impl<'a> Display for ServiceConfiguration<'a> {
         if let Some(group) = self.group {
             writeln!(f, "Group={}", group)?;
         }
+        if let Some(notify_access) = &self.notify_access {
+            writeln!(f, "NotifyAccess={}", notify_access)?;
+        }
         for env in self.envs.iter() {
             writeln!(f, r#"Environment="{}""#, env)?;
         }
         writeln!(f, "ExecStart={}", self.exec_start.join(" "))?;
         writeln!(f, "Restart={}", self.restart_policy)?;
-        writeln!(f, "RestartSec={}", self.restart_sec)
+        writeln!(f, "RestartSec={}", self.restart_sec)?;
+        writeln!(f, "Type={}", self.ty)
     }
 }
 
@@ -190,6 +212,7 @@ impl<'a> ServiceConfiguration<'a> {
 
 pub struct ServiceConfigurationBuilder<'a> {
     pub ty: ServiceType,
+    pub notify_access: Option<NotifyAccess>,
     pub exec_start: Vec<&'a str>,
     pub restart_policy: RestartPolicy,
     pub restart_sec: &'a str,
@@ -203,6 +226,7 @@ impl<'a> Default for ServiceConfigurationBuilder<'a> {
     fn default() -> Self {
         ServiceConfigurationBuilder {
             ty: ServiceType::Simple,
+            notify_access: None,
             exec_start: vec![],
             restart_policy: RestartPolicy::No,
             restart_sec: "100ms",
@@ -217,6 +241,11 @@ impl<'a> Default for ServiceConfigurationBuilder<'a> {
 impl<'a> ServiceConfigurationBuilder<'a> {
     pub fn ty(mut self, ty: ServiceType) -> Self {
         self.ty = ty;
+        self
+    }
+
+    pub fn notify_access(mut self, notify_access: NotifyAccess) -> Self {
+        self.notify_access = Some(notify_access);
         self
     }
 
@@ -258,6 +287,7 @@ impl<'a> ServiceConfigurationBuilder<'a> {
 
     pub fn build(self) -> ServiceConfiguration<'a> {
         let ty = self.ty;
+        let notify_access = self.notify_access;
         let exec_start = self.exec_start;
         let restart_policy = self.restart_policy;
         let restart_sec = self.restart_sec;
@@ -267,6 +297,7 @@ impl<'a> ServiceConfigurationBuilder<'a> {
         let envs = self.envs;
         ServiceConfiguration {
             ty,
+            notify_access,
             exec_start,
             restart_policy,
             restart_sec,
