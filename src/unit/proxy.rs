@@ -71,3 +71,24 @@ pub fn build_blocking_proxy(object: OwnedObjectPath) -> Result<SystemdUnitProxyB
         .build()?;
     Ok(proxy)
 }
+
+pub async fn build_nonblock_user_proxy(
+    object: OwnedObjectPath,
+) -> Result<SystemdUnitProxy<'static>> {
+    let connection = Connection::session().await?;
+    let proxy = SystemdUnitProxy::builder(&connection)
+        .path(object)?
+        .build()
+        .await?;
+    Ok(proxy)
+}
+
+pub fn build_blocking_user_proxy(
+    object: OwnedObjectPath,
+) -> Result<SystemdUnitProxyBlocking<'static>> {
+    let connection = blocking::Connection::session()?;
+    let proxy = SystemdUnitProxyBlocking::builder(&connection)
+        .path(object)?
+        .build()?;
+    Ok(proxy)
+}

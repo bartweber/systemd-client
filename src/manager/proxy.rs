@@ -43,8 +43,20 @@ pub async fn build_nonblock_proxy() -> Result<SystemdManagerProxy<'static>> {
     Ok(proxy)
 }
 
+pub async fn build_nonblock_user_proxy() -> Result<SystemdManagerProxy<'static>> {
+    let connection = Connection::session().await?;
+    let proxy = SystemdManagerProxy::new(&connection).await?;
+    Ok(proxy)
+}
+
 pub fn build_blocking_proxy() -> Result<SystemdManagerProxyBlocking<'static>> {
     let connection = blocking::Connection::system()?;
+    let proxy = SystemdManagerProxyBlocking::new(&connection)?;
+    Ok(proxy)
+}
+
+pub fn build_blocking_user_proxy() -> Result<SystemdManagerProxyBlocking<'static>> {
+    let connection = blocking::Connection::session()?;
     let proxy = SystemdManagerProxyBlocking::new(&connection)?;
     Ok(proxy)
 }
