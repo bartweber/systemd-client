@@ -80,6 +80,54 @@ impl ToString for UnitActiveStateType {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub enum UnitFileState {
+    Enabled,
+    EnabledRuntime,
+    Linked,
+    LinkedRuntime,
+    Masked,
+    MaskedRuntime,
+    Static,
+    Disabled,
+    Invalid,
+    Other(String),
+}
+
+impl From<String> for UnitFileState {
+    fn from(origin: String) -> Self {
+        match origin.as_str() {
+            "enabled" => UnitFileState::Enabled,
+            "enabled-runtime" => UnitFileState::EnabledRuntime,
+            "linked" => UnitFileState::Linked,
+            "linked-runtime" => UnitFileState::LinkedRuntime,
+            "masked" => UnitFileState::Masked,
+            "masked-runtime" => UnitFileState::MaskedRuntime,
+            "static" => UnitFileState::Static,
+            "disabled" => UnitFileState::Disabled,
+            "invalid" => UnitFileState::Invalid,
+            _ => UnitFileState::Other(origin),
+        }
+    }
+}
+
+impl ToString for UnitFileState {
+    fn to_string(&self) -> String {
+        match self {
+            UnitFileState::Enabled => String::from("enabled"),
+            UnitFileState::EnabledRuntime => String::from("enabled-runtime"),
+            UnitFileState::Linked => String::from("linked"),
+            UnitFileState::LinkedRuntime => String::from("linked-runtime"),
+            UnitFileState::Masked => String::from("masked"),
+            UnitFileState::MaskedRuntime => String::from("masked-runtime"),
+            UnitFileState::Static => String::from("static"),
+            UnitFileState::Disabled => String::from("disabled"),
+            UnitFileState::Invalid => String::from("invalid"),
+            UnitFileState::Other(other) => other.to_owned(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum UnitSubStateType {
     Abandon,
     Activating,
@@ -277,6 +325,7 @@ pub struct UnitProps {
     pub load_state: UnitLoadStateType,
     pub active_state: UnitActiveStateType,
     pub sub_state: UnitSubStateType,
+    pub unit_file_state: UnitFileState,
 }
 
 impl UnitProps {
@@ -291,6 +340,7 @@ pub struct UnitPropsBuilder {
     pub load_state: Option<UnitLoadStateType>,
     pub active_state: Option<UnitActiveStateType>,
     pub sub_state: Option<UnitSubStateType>,
+    pub unit_file_state: Option<UnitFileState>,
 }
 
 impl Default for UnitPropsBuilder {
@@ -307,6 +357,7 @@ impl UnitPropsBuilder {
             load_state: None,
             active_state: None,
             sub_state: None,
+            unit_file_state: None,
         }
     }
 
@@ -335,22 +386,68 @@ impl UnitPropsBuilder {
         self
     }
 
+    pub fn unit_file_state(mut self, unit_file_state: String) -> Self {
+        self.unit_file_state = Some(unit_file_state.into());
+        self
+    }
+
     pub fn build(self) -> UnitProps {
         let id = self.id.expect("id undefined");
         let description = self.description.expect("description undefined");
         let load_state = self.load_state.expect("load state undefined");
         let active_state = self.active_state.expect("active state undefined");
         let sub_state = self.sub_state.expect("sub state undefined");
+        let unit_file_state = self.unit_file_state.expect("unit file state undefined");
         UnitProps {
             id,
             description,
             load_state,
             active_state,
             sub_state,
+            unit_file_state,
         }
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct ServiceProps {
+    pub exec_main_pid: u32,
+}
+
+impl ServiceProps {
+    pub fn builder() -> ServicePropsBuilder {
+        ServicePropsBuilder::default()
+    }
+}
+
+pub struct ServicePropsBuilder {
+    pub exec_main_pid: Option<u32>,
+}
+
+impl Default for ServicePropsBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ServicePropsBuilder {
+    pub fn new() -> Self {
+        ServicePropsBuilder {
+            exec_main_pid: None,
+        }
+    }
+
+    pub fn exec_main_pid(mut self, exec_main_pid: u32) -> Self {
+        self.exec_main_pid = Some(exec_main_pid);
+        self
+    }
+
+    pub fn build(self) -> ServiceProps {
+        ServiceProps {
+            exec_main_pid: self.exec_main_pid.expect("exec_main_pid undefined"),
+        }
+    }
+}
 /*
 impl IntoModel<UnitProps> for arg::PropMap {
     fn into_model(self) -> Result<UnitProps> {

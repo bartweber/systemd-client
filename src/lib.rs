@@ -2,6 +2,7 @@ mod constants;
 pub mod errors;
 pub mod manager;
 pub mod models;
+pub mod service;
 pub mod templates;
 pub mod unit;
 pub mod utils;

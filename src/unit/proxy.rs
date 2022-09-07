@@ -17,6 +17,8 @@ trait SystemdUnit {
     fn active_state(&self) -> zbus::Result<String>;
     #[dbus_proxy(property)]
     fn sub_state(&self) -> zbus::Result<String>;
+    #[dbus_proxy(property)]
+    fn unit_file_state(&self) -> zbus::Result<String>;
 }
 
 impl SystemdUnitProxyBlocking<'_> {
@@ -26,12 +28,14 @@ impl SystemdUnitProxyBlocking<'_> {
         let load_state = self.load_state()?;
         let active_state = self.active_state()?;
         let sub_state = self.sub_state()?;
+        let unit_file_state = self.unit_file_state()?;
         let unit_props = UnitProps::builder()
             .id(id)
             .description(description)
             .load_state(load_state)
             .active_state(active_state)
             .sub_state(sub_state)
+            .unit_file_state(unit_file_state)
             .build();
         Ok(unit_props)
     }
@@ -44,12 +48,14 @@ impl SystemdUnitProxy<'_> {
         let load_state = self.load_state().await?;
         let active_state = self.active_state().await?;
         let sub_state = self.sub_state().await?;
+        let unit_file_state = self.unit_file_state().await?;
         let unit_props = UnitProps::builder()
             .id(id)
             .description(description)
             .load_state(load_state)
             .active_state(active_state)
             .sub_state(sub_state)
+            .unit_file_state(unit_file_state)
             .build();
         Ok(unit_props)
     }
