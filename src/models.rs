@@ -412,6 +412,7 @@ impl UnitPropsBuilder {
 #[derive(Clone, Debug)]
 pub struct ServiceProps {
     pub exec_main_pid: u32,
+    pub exec_main_code: i32,
 }
 
 impl ServiceProps {
@@ -422,6 +423,7 @@ impl ServiceProps {
 
 pub struct ServicePropsBuilder {
     pub exec_main_pid: Option<u32>,
+    pub exec_main_code: Option<i32>,
 }
 
 impl Default for ServicePropsBuilder {
@@ -434,6 +436,7 @@ impl ServicePropsBuilder {
     pub fn new() -> Self {
         ServicePropsBuilder {
             exec_main_pid: None,
+            exec_main_code: None,
         }
     }
 
@@ -442,9 +445,15 @@ impl ServicePropsBuilder {
         self
     }
 
+    pub fn exec_main_code(mut self, exec_main_code: i32) -> Self {
+        self.exec_main_code = Some(exec_main_code);
+        self
+    }
+
     pub fn build(self) -> ServiceProps {
         ServiceProps {
             exec_main_pid: self.exec_main_pid.expect("exec_main_pid undefined"),
+            exec_main_code: self.exec_main_code.expect("exec_main_code undefined"),
         }
     }
 }
