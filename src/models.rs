@@ -413,6 +413,7 @@ impl UnitPropsBuilder {
 pub struct ServiceProps {
     pub exec_main_pid: u32,
     pub exec_main_code: i32,
+    pub exec_main_status: i32,
 }
 
 impl ServiceProps {
@@ -424,6 +425,7 @@ impl ServiceProps {
 pub struct ServicePropsBuilder {
     pub exec_main_pid: Option<u32>,
     pub exec_main_code: Option<i32>,
+    pub exec_main_status: Option<i32>,
 }
 
 impl Default for ServicePropsBuilder {
@@ -437,6 +439,7 @@ impl ServicePropsBuilder {
         ServicePropsBuilder {
             exec_main_pid: None,
             exec_main_code: None,
+            exec_main_status: None,
         }
     }
 
@@ -450,10 +453,16 @@ impl ServicePropsBuilder {
         self
     }
 
+    pub fn exec_main_status(mut self, exec_main_status: i32) -> Self {
+        self.exec_main_status = Some(exec_main_status);
+        self
+    }
+
     pub fn build(self) -> ServiceProps {
         ServiceProps {
             exec_main_pid: self.exec_main_pid.expect("exec_main_pid undefined"),
             exec_main_code: self.exec_main_code.expect("exec_main_code undefined"),
+            exec_main_status: self.exec_main_status.expect("exec_main_status undefined"),
         }
     }
 }

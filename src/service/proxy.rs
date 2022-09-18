@@ -10,15 +10,19 @@ trait SystemdService {
     fn exec_main_pid(&self) -> zbus::Result<u32>;
     #[dbus_proxy(property)]
     fn exec_main_code(&self) -> zbus::Result<i32>;
+    #[dbus_proxy(property)]
+    fn exec_main_status(&self) -> zbus::Result<i32>;
 }
 
 impl SystemdServiceProxyBlocking<'_> {
     pub fn get_properties(&self) -> zbus::Result<ServiceProps> {
         let exec_main_pid = self.exec_main_pid()?;
         let exec_main_code = self.exec_main_code()?;
+        let exec_main_status = self.exec_main_status()?;
         let service_props = ServiceProps::builder()
             .exec_main_pid(exec_main_pid)
             .exec_main_code(exec_main_code)
+            .exec_main_status(exec_main_status)
             .build();
 
         Ok(service_props)
