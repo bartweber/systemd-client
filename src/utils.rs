@@ -6,6 +6,7 @@ use crate::{
 use std::io::Write;
 
 fn create_from_path(path: &std::path::Path, buffer: &[u8]) -> Result<()> {
+    std::fs::create_dir_all(path.parent().expect("Path should have a parent directory"))?;
     let file = std::fs::File::create(path)?;
     let mut writer = std::io::BufWriter::new(file);
     writer.write_all(buffer)?;
