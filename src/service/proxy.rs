@@ -1,11 +1,14 @@
+use zbus::{blocking, Connection, dbus_proxy, zvariant::OwnedObjectPath};
+
 use crate::{Result, ServiceProps};
-use zbus::{blocking, dbus_proxy, zvariant::OwnedObjectPath, Connection};
 
 #[dbus_proxy(
     interface = "org.freedesktop.systemd1.Service",
     default_service = "org.freedesktop.systemd1"
 )]
 trait SystemdService {
+    #[dbus_proxy(property, name = "MainPID")]
+    fn main_pid(&self) -> zbus::Result<u32>;
     #[dbus_proxy(property, name = "ExecMainPID")]
     fn exec_main_pid(&self) -> zbus::Result<u32>;
     #[dbus_proxy(property)]
@@ -16,10 +19,12 @@ trait SystemdService {
 
 impl SystemdServiceProxyBlocking<'_> {
     pub fn get_properties(&self) -> zbus::Result<ServiceProps> {
+        let main_pid = self.main_pid()?;
         let exec_main_pid = self.exec_main_pid()?;
         let exec_main_code = self.exec_main_code()?;
         let exec_main_status = self.exec_main_status()?;
         let service_props = ServiceProps::builder()
+            .main_pid(main_pid)
             .exec_main_pid(exec_main_pid)
             .exec_main_code(exec_main_code)
             .exec_main_status(exec_main_status)
@@ -31,8 +36,12 @@ impl SystemdServiceProxyBlocking<'_> {
 
 impl SystemdServiceProxy<'_> {
     pub async fn get_properties(&self) -> zbus::Result<ServiceProps> {
+        let main_pid = self.main_pid().await?;
         let exec_main_pid = self.exec_main_pid().await?;
-        let service_props = ServiceProps::builder().exec_main_pid(exec_main_pid).build();
+        let service_props = ServiceProps::builder()
+            .main_pid(main_pid)
+            .exec_main_pid(exec_main_pid)
+            .build();
 
         Ok(service_props)
     }
